@@ -1,7 +1,7 @@
 {
   "name": "easydbg",
-  "version": "1.0.0",
-  "description": "Um Query Builder e Conector de Banco de Dados moderno e unificado para Node.js, com suporte para PostgreSQL, MySQL, MSSQL e Oracle.",
+  "version": "1.0.1",
+  "description": "A modern and unified Database Connector and Query Builder. Support for PostgreSQL, MySQL, MSSQL, and Oracle with a fluent API",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "bin": {
