@@ -1,0 +1,62 @@
+# .github/workflows/ci.yml
+
+# Nome do workflow que aparecerá na aba "Actions" do GitHub
+name: Node.js CI
+
+# Define os gatilhos (triggers) que iniciarão o workflow
+on:
+  # Roda quando um push é feito para as branches main ou develop
+  push:
+    branches: [ "main", "develop" ]
+  
+  # Roda quando um Pull Request é aberto ou atualizado para a branch main
+  pull_request:
+    branches: [ "main" ]
+
+# Define os jobs (tarefas) que serão executados
+jobs:
+  # O nome do job é 'build'
+  build:
+    # O tipo de máquina virtual que o job rodará
+    runs-on: ubuntu-latest
+
+    # Define uma estratégia de matriz para rodar o job em múltiplas versões do Node.js
+    # Isso garante que seu pacote seja compatível com versões LTS (Long Term Support) populares
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x] # Versões LTS atuais e futuras
+
+    # Passos que compõem o job
+    steps:
+    # 1. Faz o checkout do código do seu repositório para a máquina virtual
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # 2. Configura o ambiente Node.js com a versão especificada na matriz
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        # Usa o cache do npm para acelerar a instalação de dependências em execuções futuras
+        cache: 'npm'
+
+    # 3. Instala todas as dependências do projeto
+    - name: Install dependencies
+      run: npm install
+
+    # 4. Roda o linter para verificar a qualidade do código
+    #    O job falhará se o linter encontrar erros
+    - name: Run linter
+      run: npm run lint
+
+    # 5. Roda os testes automatizados
+    #    O job falhará se algum teste não passar
+    - name: Run tests
+      run: npm test
+      # Adicione variáveis de ambiente se os testes precisarem delas
+      # Exemplo:
+      # env:
+      #   CI: true
+      #   DB_HOST: localhost
+      #   DB_USER: test_user
+

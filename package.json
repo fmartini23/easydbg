@@ -1,0 +1,44 @@
+{
+  "name": "easydbg",
+  "version": "1.0.0",
+  "description": "Um conector de banco de dados unificado para PostgreSQL, MySQL, MSSQL e Oracle, com uma API simples e consistente.",
+  "main": "lib/index.js", 
+  "scripts": {
+    "test": "jest", 
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fmartini23/easydbg.git"
+  },
+  "keywords": [
+    "database",
+    "sql",
+    "postgres",
+    "mysql",
+    "mssql",
+    "oracle",
+    "connector",
+    "wrapper"
+  ],
+  "author": "Fernando Martini <fernandomartini@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fmartini23/easydbg/issues"
+  },
+  "homepage": "https://github.com/fmartini23/easydbg#readme",
+  "dependencies": {
+  
+    "mssql": "^10.0.0",
+    "mysql2": "^3.0.0",
+    "oracledb": "^6.0.0",
+    "pg": "^8.11.0"
+  },
+  "devDependencies": {
+    
+    "dotenv": "^16.3.1",
+    "eslint": "^8.50.0",
+    "jest": "^29.7.0"
+  }
+}
