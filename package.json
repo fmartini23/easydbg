@@ -1,6 +1,6 @@
 {
   "name": "easydbg",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A modern and unified Database Connector and Query Builder. Support for PostgreSQL, MySQL, MSSQL, and Oracle with a fluent API",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -40,7 +40,11 @@
   "homepage": "https://github.com/fmartini23/easydbg#readme",
   "dependencies": {
     "chalk": "^4.1.2",
-    "yargs": "^17.7.2"
+    "yargs": "^17.7.2",
+      "mssql": ">=9.0.0",
+    "mysql2": ">=3.0.0",
+    "oracledb": ">=6.0.0",
+    "pg": ">=8.0.0"
   },
   "peerDependencies": {
     "mssql": ">=9.0.0",
