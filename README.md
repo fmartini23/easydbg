@@ -29,11 +29,6 @@
 ```bash
 npm install easydbg
 
-# Install database driver
-npm install pg        # PostgreSQL
-npm install mysql2    # MySQL
-npm install mssql     # SQL Server
-npm install oracledb  # Oracle
 ```
 
 ## 🚀 Quick Start
