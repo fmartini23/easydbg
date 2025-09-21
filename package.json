@@ -1,44 +1,77 @@
 {
   "name": "easydbg",
   "version": "1.0.0",
-  "description": "Um conector de banco de dados unificado para PostgreSQL, MySQL, MSSQL e Oracle, com uma API simples e consistente.",
-  "main": "lib/index.js", 
+  "description": "Um Query Builder e Conector de Banco de Dados moderno e unificado para Node.js, com suporte para PostgreSQL, MySQL, MSSQL e Oracle.",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "bin": {
+    "easydbg": "bin/easydbg.js"
+  },
   "scripts": {
-    "test": "jest", 
+    "test": "jest --verbose",
+    "test:watch": "jest --watch",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/fmartini23/easydbg.git"
+    "url": "git+https://github.com/fmartini23easydbg.git"
   },
   "keywords": [
-    "database",
     "sql",
+    "database",
+    "query builder",
+    "orm",
     "postgres",
     "mysql",
     "mssql",
     "oracle",
-    "connector",
-    "wrapper"
+    "pg",
+    "mysql2",
+    "oracledb",
+    "knex",
+    "prisma"
   ],
-  "author": "Fernando Martini <fernandomartini@gmail.com>",
+  "author": "Seu Nome <seu.email@example.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/fmartini23/easydbg/issues"
+    "url": "https://github.com/fmartini23easydbg/issues"
   },
-  "homepage": "https://github.com/fmartini23/easydbg#readme",
+  "homepage": "https://github.com/fmartini23easydbg#readme",
   "dependencies": {
-  
-    "mssql": "^10.0.0",
-    "mysql2": "^3.0.0",
-    "oracledb": "^6.0.0",
-    "pg": "^8.11.0"
+    "chalk": "^4.1.2",
+    "yargs": "^17.7.2"
+  },
+  "peerDependencies": {
+    "mssql": ">=9.0.0",
+    "mysql2": ">=3.0.0",
+    "oracledb": ">=6.0.0",
+    "pg": ">=8.0.0"
   },
   "devDependencies": {
-    
     "dotenv": "^16.3.1",
     "eslint": "^8.50.0",
     "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "files": [
+    "lib/",
+    "bin/",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "jest": {
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "./test/setup.js"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/examples/",
+      "/bin/"
+    ]
   }
 }
