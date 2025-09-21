@@ -32,7 +32,7 @@
     "knex",
     "prisma"
   ],
-  "author": "Seu Nome <seu.email@example.com>",
+  "author": "Fernando Martini <fernandomartini@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/fmartini23easydbg/issues"
@@ -73,5 +73,11 @@
       "/examples/",
       "/bin/"
     ]
-  }
+  },
+  "directories": {
+    "example": "examples",
+    "lib": "lib",
+    "test": "test"
+  },
+  "type": "commonjs"
 }
