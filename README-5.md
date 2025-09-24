@@ -1,4 +1,4 @@
-# easyDBGlobal
+# easydbg
 
 [![NPM Version](https://img.shields.io/npm/v/easydbg.svg )](https://www.npmjs.com/package/easydbg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg )](https://opensource.org/licenses/MIT)
@@ -28,6 +28,12 @@ Install `easydbg` and the database driver you will be using. `easydbg` uses `pee
 ```bash
 # Install the main package
 npm install easydbg
+
+# And install the driver for your database:
+npm install pg         # For PostgreSQL
+npm install mysql2     # For MySQL
+npm install mssql      # For Microsoft SQL Server
+npm install oracledb   # For Oracle
 ```
 
 ### 2. Configuration

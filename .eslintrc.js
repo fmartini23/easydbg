@@ -1,50 +1,43 @@
 // .eslintrc.js
 
+'use strict';
+
 module.exports = {
-  // 'root: true' impede que o ESLint procure por arquivos de configuração em diretórios pais.
-  root: true,
-
-  // Define os ambientes onde o código será executado.
-  // Isso adiciona variáveis globais predefinidas para cada ambiente.
+  // Ambiente base para todo o projeto
   env: {
-    node: true,     // Variáveis de ambiente do Node.js (ex: 'process', 'require').
-    commonjs: true, // Suporte para módulos CommonJS ('require', 'module.exports').
-    es2021: true,   // Suporte para funcionalidades do ES2021 (ECMAScript 12).
-    jest: true,     // Variáveis globais do Jest (ex: 'describe', 'it', 'expect').
+    commonjs: true,
+    es2021: true,
+    node: true,
   },
-
-  // Estende configurações recomendadas. A ordem importa.
-  extends: [
-    'eslint:recommended', // Regras recomendadas pelo ESLint.
-    'plugin:jest/recommended', // Regras recomendadas para arquivos de teste do Jest.
-  ],
-
-  // Configurações do parser, que converte o código em uma árvore abstrata que o ESLint pode analisar.
-  parserOptions: {
-    ecmaVersion: 'latest', // Usa a versão mais recente do ECMAScript.
-    sourceType: 'module',  // Permite o uso de 'import'/'export', embora usemos CommonJS.
-  },
-
-  // Personalização de regras. Aqui podemos sobrescrever ou adicionar regras específicas.
-  // Níveis de erro: "off" (0), "warn" (1), "error" (2).
+  // Estende as regras recomendadas do ESLint
+  extends: 'eslint:recommended',
+  // Regras que se aplicam a todos os arquivos
   rules: {
-    // --- Regras de Estilo e Consistência ---
-    'indent': ['error', 2, { 'SwitchCase': 1 }], // Força indentação de 2 espaços.
-    'linebreak-style': ['error', 'unix'],       // Força o uso de quebras de linha no estilo Unix (LF).
-    'quotes': ['error', 'single'],              // Força o uso de aspas simples.
-    'semi': ['error', 'always'],                // Força o uso de ponto e vírgula no final das declarações.
-    'no-trailing-spaces': 'error',              // Proíbe espaços em branco no final das linhas.
-    'comma-dangle': ['error', 'always-multiline'], // Força vírgula no final de listas multilinhas.
-
-    // --- Regras de Qualidade de Código ---
-    'no-unused-vars': ['warn', { 'args': 'none' }], // Avisa sobre variáveis não utilizadas (mas ignora argumentos de função).
-    'no-console': 'off', // Permite o uso de 'console.log', 'console.error', etc., pois nosso conector loga informações úteis.
-    'no-throw-literal': 'error', // Proíbe lançar literais (ex: throw "error") em vez de `new Error()`.
-    'eqeqeq': ['error', 'always'], // Força o uso de '===' e '!==' em vez de '==' e '!='.
-
-    // --- Regras Específicas do Jest ---
-    'jest/no-disabled-tests': 'warn', // Avisa sobre testes desabilitados (ex: 'xit', 'describe.skip').
-    'jest/no-focused-tests': 'error', // Proíbe testes focados (ex: 'fit', 'describe.only') no commit final.
-    'jest/no-identical-title': 'error', // Proíbe títulos de testes idênticos.
+    'strict': ['error', 'global'], // Exige 'use strict'; no topo dos arquivos
+    'no-console': 'warn',          // Avisa sobre o uso de console.*
+    'no-unused-vars': ['warn', { 'args': 'none' }], // Avisa sobre variáveis não usadas
+    'semi': ['error', 'always'],   // Exige ponto e vírgula
+    'quotes': ['error', 'single', { 'avoidEscape': true }], // Exige aspas simples
   },
+  // Seção de "overrides" para aplicar regras a arquivos específicos
+  overrides: [
+    {
+      // Regras específicas para arquivos de teste
+      files: ['test/**/*.js'],
+      // Estende as regras recomendadas do plugin do Jest
+      extends: ['plugin:jest/recommended'],
+      // Desabilita a regra 'no-console' apenas para os testes
+      rules: {
+        'no-console': 'off',
+      },
+    },
+    {
+      // Regras específicas para a CLI
+      files: ['bin/**/*.js'],
+      // Desabilita a regra 'no-console' apenas para a CLI
+      rules: {
+        'no-console': 'off',
+      },
+    },
+  ],
 };

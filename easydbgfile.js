@@ -1,4 +1,4 @@
-// easydbgfile.js
+'use strict'; 
 
 // Carrega as variáveis de ambiente do arquivo .env
 // É uma boa prática manter dados sensíveis fora do código.

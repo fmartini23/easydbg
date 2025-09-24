@@ -1,148 +1,156 @@
 #!/usr/bin/env node
 
-// bin/easydbg.js
-
 'use strict';
 
-const yargs = require('yargs/yargs');
-const { hideBin } = require('yargs/helpers');
+const yargs = require('yargs');
 const chalk = require('chalk');
 const path = require('path');
 const fs = require('fs');
 
-// --- Lógica da Aplicação (Simulada por enquanto) ---
-// Em um projeto real, importaríamos as classes de /lib
-// const EasyDBGClient = require('../lib/client');
-// const Migrator = require('../lib/migrations/migrator');
+/**
+ * Ponto de entrada da Interface de Linha de Comando (CLI) do easydbg.
+ *
+ * Responsabilidades:
+ * 1. Carregar a configuração do projeto (`easydbgfile.js`).
+ * 2. Definir os comandos disponíveis (migrations, seeds).
+ * 3. Analisar os argumentos da linha de comando.
+ * 4. Delegar a execução para os módulos de serviço apropriados.
+ * 5. Fornecer feedback claro e colorido para o usuário.
+ */
 
-// Simulação para este exemplo:
-const EasyDBGClient = class { constructor() { console.log(chalk.dim('Cliente DB inicializado.')) } };
-const Migrator = class {
-  constructor(db, config) {
-    this.db = db;
-    this.config = config;
-  }
-  async make(name) {
-    const dir = this.config.directory;
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
-    }
-    const timestamp = new Date().toISOString().replace(/[-:.]/g, '');
-    const fileName = `${timestamp}_${name}.js`;
-    const filePath = path.join(dir, fileName);
-    const template = `
-// Migration: ${name}
-exports.up = async (db) => {
-  // Use o Schema Builder do db para criar tabelas, etc.
-  // Ex: await db.schema.createTable('users', (table) => {
-  //   table.increments('id');
-  //   table.string('name').notNullable();
-  //   table.timestamps();
-  // });
-};
+// --- Carregamento e Validação da Configuração ---
 
-exports.down = async (db) => {
-  // Lógica para reverter a migration
-  // Ex: await db.schema.dropTable('users');
-};
-`;
-    fs.writeFileSync(filePath, template.trim());
-    return filePath;
-  }
-  async latest() { return ['migration_01.js', 'migration_02.js']; }
-  async rollback() { return ['migration_02.js']; }
-};
-// --- Fim da Simulação ---
-
-
-// Função principal da CLI
-async function main() {
-  console.log(chalk.bold.yellow('easydbg CLI'));
-
-  // 1. Carregar a configuração do projeto do usuário
+function loadConfig() {
   const configPath = path.resolve(process.cwd(), 'easydbgfile.js');
   if (!fs.existsSync(configPath)) {
-    console.error(chalk.red('Erro: Arquivo de configuração "easydbgfile.js" não encontrado.'));
-    console.log(chalk.dim('Por favor, crie o arquivo na raiz do seu projeto.'));
+    console.error(chalk.red.bold('Erro: Arquivo de configuração "easydbgfile.js" não encontrado.'));
+    console.error(chalk.yellow('Por favor, crie o arquivo de configuração na raiz do seu projeto.'));
     process.exit(1);
   }
-  const config = require(configPath);
-
-  // 2. Inicializar o cliente e o migrator
-  const db = new EasyDBGClient(config);
-  const migrator = new Migrator(db, config.migrations);
-
-  // 3. Configurar os comandos com Yargs
-  yargs(hideBin(process.argv))
-    .command(
-      'make:migration <name>',
-      'Cria um novo arquivo de migration',
-      (yargs) => {
-        yargs.positional('name', {
-          describe: 'Nome da migration (ex: criar_tabela_usuarios)',
-          type: 'string',
-        });
-      },
-      async (argv) => {
-        try {
-          console.log(chalk.cyan(`Criando migration: ${argv.name}...`));
-          const filePath = await migrator.make(argv.name);
-          console.log(chalk.green('✔ Migration criada com sucesso:'));
-          console.log(chalk.dim(filePath));
-        } catch (e) {
-          console.error(chalk.red('Erro ao criar migration:'), e.message);
-          process.exit(1);
-        }
-      }
-    )
-    .command(
-      'migrate:latest',
-      'Executa todas as migrations pendentes',
-      () => {},
-      async () => {
-        try {
-          console.log(chalk.cyan('Executando migrations...'));
-          const executed = await migrator.latest();
-          if (executed.length > 0) {
-            console.log(chalk.green('✔ Migrations executadas com sucesso:'));
-            executed.forEach(file => console.log(chalk.dim(`  - ${file}`)));
-          } else {
-            console.log(chalk.yellow('Nenhuma migration pendente para executar.'));
-          }
-        } catch (e) {
-          console.error(chalk.red('Erro ao executar migrations:'), e.message);
-          process.exit(1);
-        }
-      }
-    )
-    .command(
-      'migrate:rollback',
-      'Reverte a última leva de migrations',
-      () => {},
-      async () => {
-        try {
-          console.log(chalk.cyan('Revertendo a última migration...'));
-          const reverted = await migrator.rollback();
-           if (reverted.length > 0) {
-            console.log(chalk.green('✔ Migration revertida com sucesso:'));
-            reverted.forEach(file => console.log(chalk.dim(`  - ${file}`)));
-          } else {
-            console.log(chalk.yellow('Nenhuma migration para reverter.'));
-          }
-        } catch (e) {
-          console.error(chalk.red('Erro ao reverter migration:'), e.message);
-          process.exit(1);
-        }
-      }
-    )
-    .demandCommand(1, 'Você precisa especificar um comando.')
-    .strict()
-    .help()
-    .alias('h', 'help')
-    .argv;
+  try {
+    return require(configPath);
+  } catch (e) {
+    console.error(chalk.red.bold('Erro ao carregar o arquivo "easydbgfile.js":'));
+    console.error(e);
+    process.exit(1);
+  }
 }
 
-main().catch(err => {
-  console.error(chalk.red('Ocorreu um erro inesperado na CLI:'), err);
-  process.exit(1);
-});
+const config = loadConfig();
+
+// --- Inicialização dos Módulos de Serviço ---
+
+const easydbg = require('../lib');
+const Migrator = require('../lib/migrations/migrator');
+const Seeder = require('../lib/seeds/seeder');
+
+const db = easydbg(config);
+const migrator = new Migrator(db);
+const seeder = new Seeder(db);
+
+// --- Definição dos Comandos da CLI ---
+
+console.log(chalk.bold.cyan('easydbg CLI'));
+
+yargs(process.argv.slice(2))
+  // --- Comandos de Migration ---
+  .command(
+    'make:migration <name>',
+    'Cria um novo arquivo de migração.',
+    (y) => y.positional('name', {
+      describe: 'Nome da migração (ex: criar_tabela_usuarios)',
+      type: 'string',
+    }),
+    async (argv) => {
+      try {
+        const filename = await migrator.make(argv.name);
+        console.log(chalk.green('✅ Migração criada:'), chalk.yellow(filename));
+      } catch (e) {
+        console.error(chalk.red('❌ Erro ao criar migração:'), e.message);
+      } finally {
+        await db.disconnect();
+      }
+    }
+  )
+  .command(
+    'migrate:latest',
+    'Executa todas as migrações pendentes.',
+    async () => {
+      try {
+        const { batch, migrations } = await migrator.latest();
+        if (migrations.length === 0) {
+          console.log(chalk.blue('Banco de dados já está atualizado. Nenhuma migração pendente.'));
+        } else {
+          console.log(chalk.green(`Lote de migração #${batch} executado com sucesso:`));
+          migrations.forEach(m => console.log(chalk.cyan('   -> Migrado:'), chalk.yellow(m)));
+        }
+      } catch (e) {
+        console.error(chalk.red('❌ Erro ao executar migrações:'), e.message);
+      } finally {
+        await db.disconnect();
+      }
+    }
+  )
+  .command(
+    'migrate:rollback',
+    'Reverte o último lote de migrações executadas.',
+    async () => {
+      try {
+        const migrations = await migrator.rollback();
+        if (migrations.length === 0) {
+          console.log(chalk.blue('Nenhuma migração para reverter.'));
+        } else {
+          console.log(chalk.green('Lote de migração revertido com sucesso:'));
+          migrations.forEach(m => console.log(chalk.cyan('   -> Revertido:'), chalk.yellow(m)));
+        }
+      } catch (e) {
+        console.error(chalk.red('❌ Erro ao reverter migrações:'), e.message);
+      } finally {
+        await db.disconnect();
+      }
+    }
+  )
+  // --- Comandos de Seeding ---
+  .command(
+    'make:seed <name>',
+    'Cria um novo arquivo de seed para popular o banco de dados.',
+    (y) => y.positional('name', {
+      describe: 'Nome do seed (ex: usuarios_iniciais)',
+      type: 'string',
+    }),
+    async (argv) => {
+      try {
+        const filename = await seeder.make(argv.name);
+        console.log(chalk.green('✅ Seed criado:'), chalk.yellow(filename));
+      } catch (e) {
+        console.error(chalk.red('❌ Erro ao criar seed:'), e.message);
+      } finally {
+        await db.disconnect();
+      }
+    }
+  )
+  .command(
+    'seed:run',
+    'Executa todos os arquivos de seed do diretório de seeds.',
+    async () => {
+      try {
+        const seeds = await seeder.run();
+        if (seeds.length === 0) {
+          console.log(chalk.blue('Nenhum arquivo de seed encontrado para executar.'));
+        } else {
+          console.log(chalk.green('Seeds executados com sucesso:'));
+          seeds.forEach(s => console.log(chalk.cyan('   -> Executado:'), chalk.yellow(s)));
+        }
+      } catch (e) {
+        console.error(chalk.red('❌ Erro ao executar seeds:'), e.message);
+      } finally {
+        await db.disconnect();
+      }
+    }
+  )
+  .demandCommand(1, chalk.yellow('Você precisa fornecer um comando. Use --help para ver as opções.'))
+  .strict() // Mostra erro se um comando não reconhecido for usado
+  .help()
+  .alias('h', 'help')
+  .wrap(yargs.terminalWidth()) // Ajusta a largura da ajuda ao terminal
+  .argv;
